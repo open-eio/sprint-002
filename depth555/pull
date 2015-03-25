@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+import argparse
+import serial
+
+DEFAULT_BAUDRATE = 9600
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-p","--path", required=True, help="path to the sensor")
+parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
+
+args = parser.parse_args()
+
+try:
+    # open serial port
+    ser = serial.Serial(args.path, baudrate=DEFAULT_BAUDRATE)
+    ser.flushInput()
+    # send command and retrieve response
+    ser.write("MEAS_PULSE_MICROS\n")
+    resp = ser.readline().strip()
+    sensor_val = int(resp)
+
+    if args.verbose:
+        print "sensor value via path {}: {}".format(args.path, sensor_val)
+    else:
+        print sensor_val
+finally:
+    ser.close()
