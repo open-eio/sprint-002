@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+import argparse
+import serial
+
+DEFAULT_BAUDRATE = 9600
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-p","--path", required=True, help="path to the sensor")
+parser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
+
+args = parser.parse_args()
+
+try:
+    # open serial port
+    ser = serial.Serial(args.path, baudrate=DEFAULT_BAUDRATE)
+    ser.flushInput()
+    # send command and retrieve response
+    ser.write("TEMP\n")
+    resp = ser.readline().strip()
+    temp_val = float(resp)
+    
+    ser.write("PRESS\n")
+    resp = ser.readline().strip()
+    press_val = float(resp)
+
+    print "{\"temp_Celsius\":",temp_val, ",\"pressure_mb\":",press_val,"}"
+
+
+ #   if args.verbose:
+ #       print "TEMP via path {}: {}".format(args.path, sensor_val)
+ #   else:
+ #       print sensor_val
+
+finally:
+    ser.close()
